@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="./css/bootstrap.min.css" type="text/css" > -->
+  <style type="text/css">
+    body {
+      overflow: hidden;
+    }
+
+    /* menu-toolbar */
+    .toolbar-library {
+      position: relative;
+    }
+
+    .toolbar-library .background-box {
+      perspective: 200px;
+      display: inline-block;
+      position: absolute;
+    }
+
+    .toolbar-library .trapezoid-left {
+      width: 50px;
+      height: 370px;
+      background-color: #F7F7F7;
+      /*background-color: rgba(234, 237, 239, 1);*/
+      transform-origin: left center 0;
+      transform: rotate3d(0, 1, 0, 25deg);
+      border-radius: 0 25px 25px 0;
+    }
+
+    .toolbar-library .menu-toolbar {
+      position: absolute;
+      margin: 20px auto;
+    }
+
+    .toolbar-icon {
+      width: 30px;
+      height: 30px;
+      margin: 15px 6px;
+      display: block;
+      background-image: url(images/icon/toolbar-icon.png);
+    }
+
+    .toolbar-icon.paint-wall {
+      background-position: 0 -30px;
+    }
+
+    .toolbar-icon.paint-wall:hover,
+    .toolbar-icon.paint-wall:focus,
+    .toolbar-icon.paint-wall.selected-icon {
+      background-position: 0 0;
+    }
+
+    .toolbar-icon.paint-rectangle-wall {
+      background-position: -30px -30px;
+    }
+
+    .toolbar-icon.paint-rectangle-wall:hover,
+    .toolbar-icon.paint-rectangle-wall:focus,
+    .toolbar-icon.paint-rectangle-wall.selected-icon {
+      background-position: -30px 0;
+    }
+
+    .toolbar-icon.delete-model {
+      background-position: -60px -30px;
+    }
+
+    .toolbar-icon.delete-model:hover,
+    .toolbar-icon.delete-model:focus,
+    .toolbar-icon.delete-model.selected-icon {
+      background-position: -60px 0;
+    }
+
+    .toolbar-icon.selected-model {
+      background-position: -90px -30px;
+    }
+
+    .toolbar-icon.selected-model:hover,
+    .toolbar-icon.selected-model:focus,
+    .toolbar-icon.selected-model.selected-icon {
+      background-position: -90px 0;
+    }
+
+    .toolbar-icon.multiple-selected-model {
+      background-position: -120px -30px;
+    }
+
+    .toolbar-icon.multiple-selected-model:hover,
+    .toolbar-icon.multiple-selected-model:focus,
+    .toolbar-icon.multiple-selected-model.selected-icon {
+      background-position: -120px 0;
+    }
+
+    .toolbar-icon.bulk-copy-model {
+      background-position: -150px -30px;
+    }
+
+    .toolbar-icon.bulk-copy-model:hover,
+    .toolbar-icon.bulk-copy-model:focus,
+    .toolbar-icon.bulk-copy-model.selected-icon {
+      background-position: -150px 0;
+    }
+
+    .toolbar-icon.translate-model {
+      background-position: -180px -30px;
+    }
+
+    .toolbar-icon.translate-model:hover,
+    .toolbar-icon.translate-model:focus,
+    .toolbar-icon.translate-model.selected-icon {
+      background-position: -180px 0;
+    }
+
+    .toolbar-icon.rotate-model {
+      background-position: -210px -30px;
+    }
+
+    .toolbar-icon.rotate-model:hover,
+    .toolbar-icon.rotate-model:focus,
+    .toolbar-icon.rotate-model.selected-icon {
+      background-position: -210px 0;
+    }
+
+
+    /* 提示摸态框 */
+    .modal-tips .modal-header,
+    .modal-tips .modal-footer {
+      border: none;
+      padding: 10px 15px;
+    }
+
+    .modal-tips .modal-header h4,
+    .modal-tips .modal-body p {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .modal-tips .modal-content {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .modal-tips .modal-body {
+      text-align: center;
+      padding-bottom: 0;
+      margin-right: 0;
+    }
+
+    .modal-tips .modal-body i {
+      margin-bottom: 15px;
+    }
+
+    .modal-tips .btn-cancel,
+    .modal-tips .btn-sure {
+      padding: 5px 20px;
+    }
+
+    .modal-tips button.active.focus,
+    .modal-tips button.active:focus,
+    .modal-tips button.focus,
+    .modal-tips button:active.focus,
+    .modal-tips button:active:focus,
+    .modal-tips button:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .modal-tips .btn-cancel {
+      background-color: transparent;
+    }
+
+    .modal-tips .btn-sure {
+      color: #fff;
+    }
+
+    /* 蓝色摸态框 */
+    .modal-tips.modal-normal .modal-header {
+      background-color: #e1f2ff;
+    }
+
+    .modal-tips.modal-normal .modal-body i {
+      color: #8ec5ff;
+    }
+
+    .modal-tips.modal-normal .btn-sure {
+      background-color: #8ec5ff;
+    }
+
+    /* 黄色摸态框 */
+    .modal-tips.modal-warning .modal-header {
+      background-color: #ffdba1;
+    }
+
+    .modal-tips.modal-warning .modal-body i {
+      color: #fdbc42;
+    }
+
+    .modal-tips.modal-warning .btn-cancel {
+      color: #fdbc42;
+    }
+
+    .modal-tips.modal-warning .btn-sure {
+      background-color: #fdbc42;
+    }
+
+    /* 红色摸态框 */
+    .modal-tips.modal-dangerous .modal-header {
+      background-color: #ffb8b8;
+    }
+
+    .modal-tips.modal-dangerous .modal-body i {
+      color: #ff7676;
+    }
+
+    .modal-tips.modal-dangerous .btn-cancel {
+      color: #ff7676;
+    }
+
+    .modal-tips.modal-dangerous .btn-sure {
+      background-color: #ff7676;
+    }
+
+    /* 组件库 */
+    .component-library .background-box {
+      position: absolute;
+      right: 272px;
+    }
+
+    .component-library .trapezoid-right {
+      width: 40px;
+      height: 140px;
+      background-color: #F7F7F7;
+      transform-origin: right center 0;
+      transform: rotate3d(0, 1, 0, 25deg);
+      border-radius: 25px 0 0 25px;
+    }
+
+    .component-library .menu-toolbar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding-left: 10px;
+    }
+
+    .component-library .menu-toolbar .toolbar-icon {
+      background-color: transparent;
+      border: none;
+      margin: 12px 2px;
+    }
+
+    .toolbar-icon.toolbar-icon:focus {
+      outline: none;
+    }
+
+    .toolbar-icon.search-icon {
+      background-position: -240px -30px;
+    }
+
+    .toolbar-icon.search-icon:hover,
+    .toolbar-icon.search-icon.selected-icon {
+      background-position: -240px 0;
+    }
+
+    .toolbar-icon.focus-icon {
+      background-position: -270px -30px;
+    }
+
+    .toolbar-icon.focus-icon:hover,
+    .toolbar-icon.focus-icon.selected-icon {
+      background-position: -270px 0;
+    }
+
+    .toolbar-icon.information-icon {
+      background-position: -300px -30px;
+    }
+
+    .toolbar-icon.information-icon:hover,
+    .toolbar-icon.information-icon.selected-icon {
+      background-position: -300px 0;
+    }
+
+    .component-library {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 272px;
+      margin: 0;
+      background-color: #fff;
+    }
+
+    .component-library .nav-tabs {
+      background-color: #F7F7F7;
+      border: none;
+      border-left: 1px solid #ddd;
+      width: 50px;
+      height: 100%;
+      position: absolute;
+      right: 0;
+    }
+
+    .component-library .nav-tabs>li {
+      width: inherit;
+      margin: 0;
+      margin-left: -1px;
+    }
+
+    .component-library .nav-tabs>li>a {
+      border-radius: 0;
+    }
+
+    .component-library .nav>li>a,
+    .component-library .nav-tabs>li.active>a:hover {
+      width: 100%;
+      padding: 10px 0;
+      margin: 0;
+      text-align: center;
+      font-size: 12px;
+      color: #8a8a8a;
+      border: none;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .component-library .nav>li>a:focus,
+    .component-library .nav>li>a:hover {
+      background-color: transparent;
+    }
+
+    .component-library .nav-tabs>li.active>a,
+    .component-library .nav-tabs>li.active>a:focus {
+      background-color: #fff;
+      border: none;
+      border-bottom: 1px solid #ddd;
+      color: #42A0E6;
+    }
+
+    .component-library .tab-content>.tab-pane {
+      margin-right: 50px;
+    }
+
+
+    .component-library .component-list {
+      padding: 10px 5px 10px 10px;
+    }
+
+    .component-library .component-list-item {
+      border: 1px solid #ddd;
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .component-library .component-list-item.active {
+      border: 1px solid #42A0E6;
+    }
+
+    .component-library .component-list-item img {
+      max-width: 94px;
+      max-height: 94px;
+      vertical-align: text-top;
+    }
+
+    .component-library .cabinet-list-item {
+      background: url(images/component/black_cabinet.png) no-repeat;
+      background-size: 96px;
+    }
+
+    .component-library .cabinet-volume {
+      background-color: rgba(66, 160, 230, 0.3);
+      color: #fff;
+      font-weight: bold;
+      display: inline-block;
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+      margin-top: 28px;
+      cursor: default;
+    }
+
+    /* 提示框 */
+    .mouse-move-tips {
+      position: absolute;
+      font-family: '黑体';
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      cursor: default;
+    }
+
+    .footer-tips {
+      background: linear-gradient(90deg, #F7F7F7 5%, rgba(255, 255, 255, 0) 70%);
+      width: 100%;
+      line-height: 34px;
+      padding-left: 20px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 50;
+    }
+
+
+
+    /* .device-toolbar */
+    .device-toolbar {
+      display: inline-block;
+      position: absolute;
+    }
+
+    .device-toolbar .toolbar-icon {
+      width: 40px;
+      height: 40px;
+      background-image: url(images/icon/circle-icon.png);
+      border-radius: 50%;
+      border: none;
+      color: #fff;
+      padding: 0;
+    }
+
+    .device-toolbar .toolbar-icon:focus {
+      outline: none;
+    }
+
+    .device-toolbar .button-box {
+      width: 45px;
+      height: 40px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .device-toolbar .top-button-box {
+      margin-bottom: 10px;
+    }
+
+    .device-toolbar .top-button-box .button-box.top-center {
+      position: relative;
+      top: -20px;
+    }
+
+    .device-toolbar .bottom-button-box .button-box.bottom-center {
+      position: relative;
+      bottom: -20px;
+    }
+
+    .device-toolbar .blue-rotate-icon {
+      background-position: 0 0;
+    }
+
+    .device-toolbar .blue-rotate-icon:hover,
+    .device-toolbar .blue-rotate-icon:focus,
+    .device-toolbar .blue-rotate-icon.selected-icon {
+      background-position: 0 -40px;
+    }
+
+    .device-toolbar .blue-around-move-icon {
+      background-position: -40px 0;
+    }
+
+    .device-toolbar .blue-around-move-icon:hover,
+    .device-toolbar .blue-around-move-icon:focus,
+    .device-toolbar .blue-around-move-icon.selected-icon {
+      background-position: -40px -40px;
+    }
+
+    .device-toolbar .blue-up-down-move-icon {
+      background-position: -80px 0;
+    }
+
+    .device-toolbar .blue-up-down-move-icon:hover,
+    .device-toolbar .blue-up-down-move-icon:focus,
+    .device-toolbar .blue-up-down-move-icon.selected-icon {
+      background-position: -80px -40px;
+    }
+
+    .device-toolbar .blue-bulk-copy-icon {
+      background-position: -120px 0;
+    }
+
+    .device-toolbar .blue-bulk-copy-icon:hover,
+    .device-toolbar .blue-bulk-copy-icon:focus,
+    .device-toolbar .blue-bulk-copy-icon.selected-icon {
+      background-position: -120px -40px;
+    }
+
+    .device-toolbar .blue-delete-icon {
+      background-position: -160px 0;
+    }
+
+    .device-toolbar .blue-delete-icon:hover,
+    .device-toolbar .blue-delete-icon:focus,
+    .device-toolbar .blue-delete-icon.selected-icon {
+      background-position: -160px -40px;
+    }
+
+    .device-toolbar .blue-information-icon {
+      background-position: -200px 0;
+    }
+
+    .device-toolbar .blue-information-icon:hover,
+    .device-toolbar .blue-information-icon:focus,
+    .device-toolbar .blue-information-icon.selected-icon {
+      background-position: -200px -40px;
+    }
+
+    .device-toolbar .blue-setting-icon {
+      background-position: -240px 0;
+    }
+
+    .device-toolbar .blue-setting-icon:hover,
+    .device-toolbar .blue-setting-icon:focus,
+    .device-toolbar .blue-setting-icon.selected-icon {
+      background-position: -240px -40px;
+    }
+
+    .device-toolbar .blue-edit-icon {
+      background-position: -280px 0;
+    }
+
+    .device-toolbar .blue-edit-icon:hover,
+    .device-toolbar .blue-edit-icon:focus,
+    .device-toolbar .blue-edit-icon.selected-icon {
+      background-position: -280px -40px;
+    }
+
+
+    .device-toolbar .white-rotate-icon {
+      background-position: 0 -80px;
+    }
+
+    .device-toolbar .white-rotate-icon:hover,
+    .device-toolbar .white-rotate-icon:focus,
+    .device-toolbar .white-rotate-icon.selected-icon {
+      background-position: 0 -120px;
+    }
+
+    .device-toolbar .white-around-move-icon {
+      background-position: -40px -80px;
+    }
+
+    .device-toolbar .white-around-move-icon:hover,
+    .device-toolbar .white-around-move-icon:focus,
+    .device-toolbar .white-around-move-icon.selected-icon {
+      background-position: -40px -120px;
+    }
+
+    .device-toolbar .white-up-down-move-icon {
+      background-position: -80px -80px;
+    }
+
+    .device-toolbar .white-up-down-move-icon:hover,
+    .device-toolbar .white-up-down-move-icon:focus,
+    .device-toolbar .white-up-down-move-icon.selected-icon {
+      background-position: -80px -120px;
+    }
+
+    .device-toolbar .white-bulk-copy-icon {
+      background-position: -120px -80px;
+    }
+
+    .device-toolbar .white-bulk-copy-icon:hover,
+    .device-toolbar .white-bulk-copy-icon:focus,
+    .device-toolbar .white-bulk-copy-icon.selected-icon {
+      background-position: -120px -120px;
+    }
+
+    .device-toolbar .white-delete-icon {
+      background-position: -160px -80px;
+    }
+
+    .device-toolbar .white-delete-icon:hover,
+    .device-toolbar .white-delete-icon:focus,
+    .device-toolbar .white-delete-icon.selected-icon {
+      background-position: -160px -120px;
+    }
+
+    .device-toolbar .white-information-icon {
+      background-position: -200px -80px;
+    }
+
+    .device-toolbar .white-information-icon:hover,
+    .device-toolbar .white-information-icon:focus,
+    .device-toolbar .white-information-icon.selected-icon {
+      background-position: -200px -120px;
+    }
+
+    .device-toolbar .white-setting-icon {
+      background-position: -240px -80px;
+    }
+
+    .device-toolbar .white-setting-icon:hover,
+    .device-toolbar .white-setting-icon:focus,
+    .device-toolbar .white-setting-icon.selected-icon {
+      background-position: -240px -120px;
+    }
+
+    .device-toolbar .white-edit-icon {
+      background-position: -280px -80px;
+    }
+
+    .device-toolbar .white-edit-icon:hover,
+    .device-toolbar .white-edit-icon:focus,
+    .device-toolbar .white-edit-icon.selected-icon {
+      background-position: -280px -120px;
+    }
+
+    .required-label:before {
+      content: "* ";
+      color: #ff4747;
+    }
+
+    .modal-information .modal-header {
+      padding: 14px;
+      background-color: #8ec5ff;
+      border: none;
+      color: #fff;
+    }
+
+    .modal-information .modal-header h4 {
+      font-size: 16px;
+    }
+
+    .modal-information button.close {
+      color: #f2f2f2;
+      opacity: 1;
+      text-shadow: none;
+      font-size: 30px;
+      position: absolute;
+      right: 15px;
+      top: 11px;
+    }
+
+    .modal-information button.close:hover,
+    .modal-information button.close:focus {
+      outline: none;
+      color: #fff;
+    }
+
+    .modal-information .modal-body {
+      padding-bottom: 0;
+    }
+
+
+    .modal-information .modal-footer {
+      border: none;
+    }
+
+    .modal-information .details-title,
+    .modal-information .label-box {
+      text-align: right;
+      width: 100px;
+      float: left;
+    }
+
+    .modal-information .label-box {
+      font-weight: normal;
+      margin: 0;
+      line-height: 34px;
+    }
+
+    .modal-information .details-content,
+    .modal-information .input-box {
+      text-align: left;
+      margin-left: 100px;
+      min-width: 10px;
+      word-wrap: break-word;
+    }
+
+    .modal-information .modal-footer button {
+      min-width: 100px;
+    }
+
+    .modal-information .btn-add {
+      min-width: 100px;
+      color: #8ec5ff;
+      background-color: transparent;
+      border: 1px solid #8ec5ff;
+    }
+
+    .modal-information .btn-cancel {
+      background-color: #fafafa;
+      border: 1px solid #fafafa;
+    }
+
+    .modal-information .btn-sure {
+      background-color: #8ec5ff;
+      border: 1px solid #8ec5ff;
+      color: #fff;
+      margin-left: 15px !important;
+    }
+  </style>
+</head>
+
+<!-- oncontextmenu="return false;" 禁止鼠标右键， onselectstart="return false;" 禁止鼠标复制。 -->
+
+<body oncontextmenu="return false;" onselectstart="return false;">
+  <div class="toolbar-library">
+    <div class="background-box">
+      <div class="trapezoid-left"></div>
+    </div>
+    <div class="menu-toolbar js-menu-toolbar">
+      <div class="checkbox">
+        <label class="toolbar-icon selected-icon selected-model js-selected-model" title="选择"><input type="checkbox"
+            hidden value='selected'></label>
+        <label class="toolbar-icon multiple-selected-model js-multiple-selected-model" title="批量选择"><input
+            type="checkbox" hidden value='multiple-selected'></label>
+        <label class="toolbar-icon bulk-copy-model js-bulk-copy-model" title="批量复制"><input type="checkbox" hidden
+            value='bulk-copy'></label>
+        <label class="toolbar-icon translate-model js-translate-model-btn" title="移动旋转" data-><input type="checkbox"
+            hidden value='translate'></label>
+        <!-- <label class="toolbar-icon rotate-model js-rotate-model-btn" title="旋转" data-><input type="checkbox" hidden value='rotate'></label> -->
+        <label class="toolbar-icon paint-wall js-paint-wall" title="绘制墙"><input type="checkbox" hidden
+            value="paint-wall"></label>
+        <label class="toolbar-icon paint-rectangle-wall js-paint-rectangle-wall" title="绘制矩形墙"><input type="checkbox"
+            hidden value="paint-rectangle-wall"></label>
+        <label class="toolbar-icon delete-model js-delete-model-btn" title="删除" data-><input type="checkbox" hidden
+            value='delete'></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-library">
+    <div class="background-box">
+      <div class="trapezoid-right"></div>
+      <div class="menu-toolbar js-menu-toolbar">
+        <button class="toolbar-icon search-icon" type="button" title="搜索"></button>
+        <button class="toolbar-icon information-icon" type="button" title="信息" data-toggle="modal"
+          data-target="#information-modal"></button>
+        <button class="toolbar-icon focus-icon js-focus-model-btn" type="button" title="聚焦"></button>
+      </div>
+    </div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs js-component-title" role="tablist">
+      <li role="presentation"><a href="#door" aria-controls="door" role="tab" data-toggle="tab">门</a></li>
+      <li role="presentation"><a href="#window" aria-controls="window" role="tab" data-toggle="tab">窗户</a></li>
+      <li role="presentation" class="active"><a href="#cabinet" aria-controls="cabinet" role="tab"
+          data-toggle="tab">机柜</a></li>
+      <li role="presentation"><a href="#server" aria-controls="server" role="tab" data-toggle="tab">服务器</a></li>
+      <li role="presentation"><a href="#sensor" aria-controls="sensor" role="tab" data-toggle="tab">传感器</a></li>
+      <li role="presentation"><a href="#monitor" aria-controls="monitor" role="tab" data-toggle="tab">监控器</a></li>
+      <li role="presentation"><a href="#appliances" aria-controls="appliances" role="tab" data-toggle="tab">电器</a></li>
+      <li role="presentation"><a href="#other" aria-controls="other" role="tab" data-toggle="tab">其他</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane" id="door">
+        <ul class="list-unstyled component-list js-component-list" data-type="door">
+          <li class="component-list-item" data-create-method="single_door"
+            data-texture="images/texture/door/black_door.png">
+            <img src="images/component/black_door.png">
+          </li>
+          <li class="component-list-item" data-create-method="single_door"
+            data-texture="images/texture/door/white_door.png">
+            <img src="images/component/white_door.png">
+          </li>
+          <!--   <li class="component-list-item" data-create-method="double_door" data-texture="images/texture/door/white_glass_door.png">
+            <img src="images/component/double_white_glass_door.png" data-texture=">
+          </li> -->
+          <li class="component-list-item" data-create-method="double_door"
+            data-texture="images/texture/door/black_glass_door.png">
+            <img src="images/component/double_black_glass_door.png">
+          </li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="window">
+        <ul class="list-unstyled component-list js-component-list" data-type="window">
+          <li class="component-list-item" data-create-method="window"
+            data-texture="images/texture/window/vertical_white_glass_window.png">
+            <img src="images/component/vertical_white_glass_window.png">
+          </li>
+          <li class="component-list-item" data-create-method="window"
+            data-texture="images/texture/window/line_black_glass_window.png">
+            <img src="images/component/line_black_glass_window.png">
+          </li>
+          <li class="component-list-item" data-create-method="window"
+            data-texture="images/texture/window/white_lattice_window.png">
+            <img src="images/component/white_lattice_window.png">
+          </li>
+        </ul>
+      </div>
+
+      <div role="tabpanel" class="tab-pane active" id="cabinet">
+        <ul class="list-unstyled component-list js-component-list" data-type="cabinet">
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="22.15">
+            <span class="cabinet-volume">47U</span>
+            <!-- <img src="images/component/black_cabinet.png"> -->
+          </li>
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="21.7">
+            <span class="cabinet-volume">46U</span>
+          </li>
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="19.9">
+            <span class="cabinet-volume">42U</span>
+          </li>
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="19">
+            <span class="cabinet-volume">40U</span>
+          </li>
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="17.65">
+            <span class="cabinet-volume">37U</span>
+          </li>
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="11.8">
+            <span class="cabinet-volume">24U</span>
+          </li>
+          <li class="component-list-item cabinet-list-item" data-create-method="cabinet" data-length="8" data-width="8"
+            data-height="9.1">
+            <span class="cabinet-volume">18U</span>
+          </li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="server">
+        <ul class="list-unstyled component-list js-component-list" data-type="server">
+          <li class="component-list-item" data-create-method="server" data-length="6" data-width="6" data-height="0.45"
+            data-texture="images/texture/server/server_1u.jpg">
+            <img src="images/component/server_1u.png">
+          </li>
+          <li class="component-list-item" data-create-method="server" data-length="6" data-width="6" data-height="0.9"
+            data-texture="images/texture/server/server_2u.jpg">
+            <img src="images/component/server_2u.png">
+          </li>
+          <li class="component-list-item" data-create-method="server" data-length="6" data-width="6" data-height="1.35"
+            data-texture="images/texture/server/server_3u.jpg">
+            <img src="images/component/server_3u.png">
+          </li>
+          <li class="component-list-item" data-create-method="server" data-length="6" data-width="6" data-height="1.8"
+            data-texture="images/texture/server/server_4u.jpg">
+            <img src="images/component/server_4u.png">
+          </li>
+          <li class="component-list-item" data-create-method="server" data-length="6" data-width="6" data-height="2.25"
+            data-texture="images/texture/server/server_5u.jpg">
+            <img src="images/component/server_5u.png">
+          </li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="sensor">
+        <ul class="list-unstyled component-list js-component-list" data-type="sensor">
+          <li class="component-list-item" data-create-method="sensor"
+            data-texture="images/texture/sensor/thermometer.png">
+            <img src="images/component/thermometer.png">
+          </li>
+          <li class="component-list-item" data-create-method="sensor"
+            data-texture="images/texture/sensor/hygrometer.png">
+            <img src="images/component/hygrometer.png">
+          </li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="monitor">
+        <ul class="list-unstyled component-list js-component-list" data-type="monitor">
+          <li class="component-list-item" data-create-method="loadModel" data-obj-url="models/monitor.obj"
+            data-mtl-url="models/monitor.mtl">
+            <img src="images/component/monitor.png">
+          </li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="appliances">
+        <ul class="list-unstyled component-list js-component-list" data-type="appliances">
+          <!-- <li class="component-list-item" data-create-method="loadModel" data-shape="wallMounted" data-obj-url="models/wall_mounted_air_conditioner.obj"
+            data-mtl-url="models/wall_mounted_air_conditioner.mtl">
+            <img src="images/component/wall_mounted_air_conditioner.png">
+          </li> -->
+          <li class="component-list-item" data-create-method="closet_type_air_conditioning" data-shape="closetType"
+            data-length="5.5" data-width="3" data-height="18">
+            <img src="images/component/closet_type_air_conditioning.png">
+          </li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="other">
+        <ul class="list-unstyled component-list js-component-list" data-type="other">
+          <li class="component-list-item" data-create-method="loadModel" data-shape="battery"
+            data-obj-url="models/battery.obj" data-mtl-url="models/battery.mtl">
+            <img src="images/component/battery.png">
+          </li>
+          <!--     <li class="component-list-item" data-create-method="pointLight">
+            <img src="#">
+          </li> -->
+
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvas"></div>
+
+  <!-- <div class="mouse-move-tips hidden"></div> -->
+  <footer class="footer-tips js-footer-tips hidden"></footer>
+
+  <!-- delete-modal -->
+  <div class="modal fade modal-tips modal-dangerous" id="delete-modal">
+    <div class="modal-dialog  modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">删除</h4>
+        </div>
+        <div class="modal-body">
+          <i class="fa fa-exclamation-circle fa-4x"></i>
+          <p>确定要删除所选的设备<span class="js-modal-object-name"></span>吗？</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-sure js-sure-delete-model-btn">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- information-modal -->
+  <div class="modal fade modal-information" id="information-modal">
+    <div class="modal-dialog  modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">设备信息</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-xs-6">
+              <div class="details-title">设备名称：</div>
+              <div class="details-content">设备名称设备名称设备名称设备名称设备名称设备名称</div>
+            </div>
+            <div class="col-xs-6">
+              <div class="details-title">设备类型：</div>
+              <div class="details-content"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-6">
+              <div class="details-title">设备名称：</div>
+              <div class="details-content">kkkkk</div>
+            </div>
+            <div class="col-xs-6">
+              <div class="details-title">设备类型：</div>
+              <div class="details-content"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-6">
+              <label class="control-label required-label label-box">服务器名称：</label>
+              <div class="input-box">
+                <input type="text" class="form-control" name="server-name">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-sure">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="./assets/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="./assets/bootstrap.min.js"></script>
+  <script type="text/javascript" src="./assets/three.js"></script>
+  <script type="text/javascript" src="./assets/dat.gui.min.js"></script>
+  <script type="text/javascript" src="./assets/OrbitControls.js"></script>
+
+  <script type="text/javascript" src="./assets/OBJLoader.js"></script>
+  <script type="text/javascript" src="./assets/MTLLoader.js"></script>
+  <script type="text/javascript" src="./assets/ThreeCSG.js"></script>
+  <script type="text/javascript" src="./main.js"></script>
+
+</body>
+
+</html>
